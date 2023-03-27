@@ -23,7 +23,7 @@ cd hello/cmd/hello
 go run main.go // serves to port 8080
 ```
 
-Make the `go` web development experience quicker by installing
+I made my `go` web development experience quicker by installing
 `gow` -- go watcher from https://github.com/mitranim/gow
 
 The following is my gow watch command:
