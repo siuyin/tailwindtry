@@ -31,3 +31,12 @@ The following is my gow watch command:
 cd hello/cmd/hello
 gow -v -e=go -e=mod -e=css -e=html run .
 ```
+
+## Running the github user search api example
+```
+export GITHUB_TOKEN=<paste your token here>
+go run main.go
+curl -L localhost:8080/api/v1/github/{username}
+
+eg.
+curl -L localhost:8080/api/v1/github/siuyin
