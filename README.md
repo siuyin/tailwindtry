@@ -33,6 +33,13 @@ gow -v -e=go -e=mod -e=css -e=html run .
 ```
 
 ## Running the github user search api example
+Create and user a github token if you see a "limits exceeded"
+response from github.
+
+By default I make an unauthenticated request to the github API.
+This is rather low rate limit levels.
+
+
 ```
 export GITHUB_TOKEN=<paste your token here>
 go run main.go

@@ -23,11 +23,17 @@ func main() {
 	rootHandler(tmpl)
 
 	http.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.ExecuteTemplate(w, "about", map[string]string{"title": "About Us"})
+		tmpl.ExecuteTemplate(w, "about", map[string]string{
+			"title":   "About Us",
+			"subject": "About Us",
+		})
 	})
 
 	http.HandleFunc("/contact", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.ExecuteTemplate(w, "contact", map[string]string{"title": "Contact"})
+		tmpl.ExecuteTemplate(w, "contact", map[string]string{
+			"title":   "Contact",
+			"subject": "Our contacts",
+		})
 	})
 
 	robotstxt()
@@ -49,6 +55,7 @@ func rootHandler(tmpl *template.Template) {
 
 		tmpl.ExecuteTemplate(w, "main", map[string]interface{}{
 			"title":   "Gerbau",
+			"subject": "Welcome to Gerbau",
 			"content": func() string { return "brown fox" }(),
 			"btn1": struct {
 				ID      string
@@ -87,7 +94,10 @@ func apiV1Github() {
 		}
 
 		req.Header.Add("Accept", "application/vnd.github+json")
-		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", dflt.EnvString("GITHUB_TOKEN", "none")))
+		token := dflt.EnvString("GITHUB_TOKEN", "none")
+		if token != "none" {
+			req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", token))
+		}
 		resp, err := client.Do(req)
 		if err != nil {
 			log.Println(err)

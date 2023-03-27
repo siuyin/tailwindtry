@@ -1,6 +1,6 @@
 {{- define "main" -}}
   {{template "header" .}}
-  <h1 class="text-blue-800 text-6xl mx-4 my-2">Welcome to {{.title}}</h1>
+  {{template "subject" .subject}}
   <p class="text-xl text-emerald-800">{{.content}}</p>
   <div>
     {{template "button" .btn1}}
