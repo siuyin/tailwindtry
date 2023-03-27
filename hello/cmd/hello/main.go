@@ -40,6 +40,10 @@ func main() {
 		tmpl.ExecuteTemplate(w, "about", map[string]string{"title": "About Us"})
 	})
 
+	http.HandleFunc("/contact", func(w http.ResponseWriter, r *http.Request) {
+		tmpl.ExecuteTemplate(w, "contact", map[string]string{"title": "Contact"})
+	})
+
 	http.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `User-agent: *
 		Disallow: /login/`)
