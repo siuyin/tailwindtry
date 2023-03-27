@@ -1,0 +1,5 @@
+{{- define "button" -}}
+<button 
+  class="p-1 text-xl border-green-500 rounded-md border {{.Color}} {{.BG}}"
+  id="{{.ID}}" onclick="{{.OnClick}}">{{.Text}}</button>
+{{- end -}}

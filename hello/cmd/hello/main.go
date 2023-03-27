@@ -16,9 +16,24 @@ func main() {
 	tmpl := template.Must(template.ParseFS(content, "tmpl/*.html"))
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.ExecuteTemplate(w, "main", map[string]string{
-			"title":   "My Title",
-			"content": "The quick brown fox"})
+		tmpl.ExecuteTemplate(w, "main", map[string]interface{}{
+			"title":   "Gerbau",
+			"content": func() string { return "brown fox" }(),
+			"btn1": struct {
+				ID      string
+				Text    string
+				Color   string
+				BG      string
+				OnClick template.JS
+			}{"btn1", "Lazy Dog", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML="You clicked the button"`)},
+			"btn2": struct {
+				ID      string
+				Text    string
+				Color   string
+				BG      string
+				OnClick template.JS
+			}{"btn2", "Clear", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML=""`)},
+		})
 	})
 
 	http.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
