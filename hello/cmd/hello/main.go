@@ -29,8 +29,9 @@ func main() {
 	})
 
 	http.HandleFunc("/contact", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.ExecuteTemplate(w, "contact", map[string]string{
+		tmpl.ExecuteTemplate(w, "contact", map[string]any{
 			"title": "Contact",
+			"list":  []string{"phone1", "phone2", "phone3"},
 		})
 	})
 
