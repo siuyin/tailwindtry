@@ -2,7 +2,7 @@
 These are my experiments is trying to use `go` templates
 as web components with tailwind CSS styling.
 
-Here is combine the best of both the `go` and `nodejs` worlds.
+Potentially combining the best of both the `go` and `nodejs` worlds.
 
 `go` is robust, lean on resources and fast, but lacks
 a healthy fontend development community.
