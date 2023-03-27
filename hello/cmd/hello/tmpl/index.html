@@ -1,11 +1,11 @@
 {{- define "main" -}}
   {{template "header" .}}
-  <h1 class="text-blue-800 text-6xl mx-4 my-2">Welcome to {{.title}}.</h1>
+  <h1 class="text-blue-800 text-6xl mx-4 my-2">Welcome to {{.title}}</h1>
   <p class="text-xl text-emerald-800">{{.content}}</p>
-  <p class="text-xl" id="status"></p>
   <div>
     {{template "button" .btn1}}
     {{template "button" .btn2}}
   </div>
+  <p class="text-xl" id="status"></p>
   {{template "footer" .}}
 {{- end -}}

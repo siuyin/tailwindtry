@@ -5,6 +5,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="This is site is about {{.title}}.">
 
   <title>{{.title}}</title>
 
@@ -28,6 +29,6 @@
 
   <link rel="stylesheet" href="/static/styles.min.css">
 </head>
-<body>
+<body class="ml-2">
 {{template "nav" .}}
 {{- end -}}
