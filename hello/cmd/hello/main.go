@@ -16,6 +16,14 @@ import (
 //go:embed all:static all:tmpl
 var content embed.FS
 
+type Button struct {
+	ID      string
+	Text    string
+	Color   string
+	BG      string
+	OnClick template.JS
+}
+
 func main() {
 	//tmpl := template.Must(template.ParseGlob("./tmpl/*.html"))
 	tmpl := template.Must(template.ParseFS(content, "tmpl/*.html"))
@@ -55,38 +63,13 @@ func rootHandler(tmpl *template.Template) {
 		tmpl.ExecuteTemplate(w, "main", map[string]interface{}{
 			"title":   "Gerbau",
 			"content": func() string { return "brown fox" }(),
-			"btn1": struct {
-				ID      string
-				Text    string
-				Color   string
-				BG      string
-				OnClick template.JS
-			}{"btn1", "Lazy Dog", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML="You clicked the button"`)},
-			"btn2": struct {
-				ID      string
-				Text    string
-				Color   string
-				BG      string
-				OnClick template.JS
-			}{"btn2", "Clear", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML=""`)},
-			"mod1": struct {
-				ID      string
-				Text    string
-				Color   string
-				BG      string
-				OnClick template.JS
-			}{"mod1", "Modal Demo", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("modal1").classList.remove("hidden")`)},
+			"btn1":    Button{"btn1", "Lazy Dog", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML="You clicked the button"`)},
+			"btn2":    Button{"btn2", "Clear", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML=""`)},
+			"mod1":    Button{"mod1", "Modal Demo", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("modal1").classList.remove("hidden")`)},
 			"modal1": struct {
 				ID  string
-				Btn any
-			}{"modal1",
-				struct {
-					ID      string
-					Text    string
-					Color   string
-					BG      string
-					OnClick template.JS
-				}{"modClose", "Close", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("modal1").classList.add("hidden")`)}},
+				Btn Button
+			}{"modal1", Button{"modClose", "Close", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("modal1").classList.add("hidden")`)}},
 		})
 	})
 }
