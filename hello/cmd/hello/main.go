@@ -9,6 +9,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
+
+	"github.com/siuyin/dflt"
 )
 
 //go:embed all:static all:tmpl
@@ -55,7 +57,16 @@ func main() {
 	http.HandleFunc("/api/v1/github/", func(w http.ResponseWriter, r *http.Request) {
 		p := strings.Split(html.EscapeString(r.URL.Path), "/")
 		usr := p[len(p)-1]
-		resp, err := http.Get(fmt.Sprintf("https://api.github.com/users/%s", usr))
+		client := &http.Client{}
+		req, err := http.NewRequest("GET", fmt.Sprintf("https://api.github.com/users/%s", usr), nil)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		req.Header.Add("Accept", "application/vnd.github+json")
+		req.Header.Add("Authorization", fmt.Sprintf("Bearer %s", dflt.EnvString("GITHUB_TOKEN", "none")))
+		resp, err := client.Do(req)
 		if err != nil {
 			log.Println(err)
 			return
