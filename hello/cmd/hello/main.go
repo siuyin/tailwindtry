@@ -3,9 +3,12 @@ package main
 import (
 	"embed"
 	"fmt"
+	"html"
 	"html/template"
+	"io/ioutil"
 	"log"
 	"net/http"
+	"strings"
 )
 
 //go:embed all:static all:tmpl
@@ -47,6 +50,23 @@ func main() {
 	http.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `User-agent: *
 		Disallow: /login/`)
+	})
+
+	http.HandleFunc("/api/v1/github/", func(w http.ResponseWriter, r *http.Request) {
+		p := strings.Split(html.EscapeString(r.URL.Path), "/")
+		usr := p[len(p)-1]
+		resp, err := http.Get(fmt.Sprintf("https://api.github.com/users/%s", usr))
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		body, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		w.Write(body)
 	})
 
 	//http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
