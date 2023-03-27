@@ -1,8 +1,7 @@
 # Tailwind CSS with Go templates
-These are my experiments is trying to use `go` templates
+These are my experiments in trying to use `go` templates
 as web components with tailwind CSS styling.
-
-Potentially combining the best of both the `go` and `nodejs` worlds.
+Thus potentially combining the best of both `go` and `nodejs` worlds.
 
 `go` is robust, lean on resources and fast, but lacks
 a healthy frontend development community.
