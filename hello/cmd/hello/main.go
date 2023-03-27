@@ -69,6 +69,24 @@ func rootHandler(tmpl *template.Template) {
 				BG      string
 				OnClick template.JS
 			}{"btn2", "Clear", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML=""`)},
+			"mod1": struct {
+				ID      string
+				Text    string
+				Color   string
+				BG      string
+				OnClick template.JS
+			}{"mod1", "Modal Demo", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("modal1").classList.remove("hidden")`)},
+			"modal1": struct {
+				ID  string
+				Btn any
+			}{"modal1",
+				struct {
+					ID      string
+					Text    string
+					Color   string
+					BG      string
+					OnClick template.JS
+				}{"modClose", "Close", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("modal1").classList.add("hidden")`)}},
 		})
 	})
 }
