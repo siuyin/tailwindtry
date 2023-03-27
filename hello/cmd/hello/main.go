@@ -24,15 +24,13 @@ func main() {
 
 	http.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
 		tmpl.ExecuteTemplate(w, "about", map[string]string{
-			"title":   "About Us",
-			"subject": "About Us",
+			"title": "About Us",
 		})
 	})
 
 	http.HandleFunc("/contact", func(w http.ResponseWriter, r *http.Request) {
 		tmpl.ExecuteTemplate(w, "contact", map[string]string{
-			"title":   "Contact",
-			"subject": "Our contacts",
+			"title": "Contact",
 		})
 	})
 
@@ -55,7 +53,6 @@ func rootHandler(tmpl *template.Template) {
 
 		tmpl.ExecuteTemplate(w, "main", map[string]interface{}{
 			"title":   "Gerbau",
-			"subject": "Welcome to Gerbau",
 			"content": func() string { return "brown fox" }(),
 			"btn1": struct {
 				ID      string
