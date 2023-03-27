@@ -20,7 +20,33 @@ func main() {
 	//tmpl := template.Must(template.ParseGlob("./tmpl/*.html"))
 	tmpl := template.Must(template.ParseFS(content, "tmpl/*.html"))
 
+	rootHandler(tmpl)
+
+	http.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
+		tmpl.ExecuteTemplate(w, "about", map[string]string{"title": "About Us"})
+	})
+
+	http.HandleFunc("/contact", func(w http.ResponseWriter, r *http.Request) {
+		tmpl.ExecuteTemplate(w, "contact", map[string]string{"title": "Contact"})
+	})
+
+	robotstxt()
+
+	apiV1Github()
+
+	//http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
+	http.Handle("/static/", http.FileServer(http.FS(content)))
+
+	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func rootHandler(tmpl *template.Template) {
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path != "/" {
+			w.WriteHeader(404)
+			return
+		}
+
 		tmpl.ExecuteTemplate(w, "main", map[string]interface{}{
 			"title":   "Gerbau",
 			"content": func() string { return "brown fox" }(),
@@ -40,20 +66,16 @@ func main() {
 			}{"btn2", "Clear", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML=""`)},
 		})
 	})
+}
 
-	http.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.ExecuteTemplate(w, "about", map[string]string{"title": "About Us"})
-	})
-
-	http.HandleFunc("/contact", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.ExecuteTemplate(w, "contact", map[string]string{"title": "Contact"})
-	})
-
+func robotstxt() {
 	http.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `User-agent: *
 		Disallow: /login/`)
 	})
+}
 
+func apiV1Github() {
 	http.HandleFunc("/api/v1/github/", func(w http.ResponseWriter, r *http.Request) {
 		p := strings.Split(html.EscapeString(r.URL.Path), "/")
 		usr := p[len(p)-1]
@@ -79,9 +101,4 @@ func main() {
 		}
 		w.Write(body)
 	})
-
-	//http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
-	http.Handle("/static/", http.FileServer(http.FS(content)))
-
-	log.Fatal(http.ListenAndServe(":8080", nil))
 }
