@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/nats-io/nuid"
 	"github.com/siuyin/dflt"
 )
 
@@ -28,24 +29,16 @@ func main() {
 	//tmpl := template.Must(template.ParseGlob("./tmpl/*.html"))
 	tmpl := template.Must(template.ParseFS(content, "tmpl/*.html"))
 
-	rootHandler(tmpl)
+	rootHandler("/", tmpl)
 
-	http.HandleFunc("/about", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.ExecuteTemplate(w, "about", map[string]string{
-			"title": "About Us",
-		})
-	})
+	aboutHandler("/about", tmpl)
 
-	http.HandleFunc("/contact", func(w http.ResponseWriter, r *http.Request) {
-		tmpl.ExecuteTemplate(w, "contact", map[string]any{
-			"title": "Contact",
-			"list":  []string{"phone1", "phone2", "phone3"},
-		})
-	})
+	contactHandler("/contact", tmpl)
 
-	robotstxt()
+	robotstxt("/robots.txt")
 
-	apiV1Github()
+	apiV1Github("/api/v1/github/")
+	apiV1NUID("/api/v1/nuid")
 
 	//http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.Handle("/static/", http.FileServer(http.FS(content)))
@@ -53,8 +46,8 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func rootHandler(tmpl *template.Template) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+func rootHandler(mnt string, tmpl *template.Template) {
+	http.HandleFunc(mnt, func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path != "/" {
 			w.WriteHeader(404)
 			return
@@ -74,15 +67,32 @@ func rootHandler(tmpl *template.Template) {
 	})
 }
 
-func robotstxt() {
-	http.HandleFunc("/robots.txt", func(w http.ResponseWriter, r *http.Request) {
+func robotstxt(mnt string) {
+	http.HandleFunc(mnt, func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `User-agent: *
 		Disallow: /login/`)
 	})
 }
 
-func apiV1Github() {
-	http.HandleFunc("/api/v1/github/", func(w http.ResponseWriter, r *http.Request) {
+func aboutHandler(mnt string, tmpl *template.Template) {
+	http.HandleFunc(mnt, func(w http.ResponseWriter, r *http.Request) {
+		tmpl.ExecuteTemplate(w, "about", map[string]string{
+			"title": "About Us",
+		})
+	})
+}
+
+func contactHandler(mnt string, tmpl *template.Template) {
+	http.HandleFunc(mnt, func(w http.ResponseWriter, r *http.Request) {
+		tmpl.ExecuteTemplate(w, "contact", map[string]any{
+			"title": "Contact",
+			"list":  []string{"phone1", "phone2", "phone3"},
+		})
+	})
+}
+
+func apiV1Github(mnt string) {
+	http.HandleFunc(mnt, func(w http.ResponseWriter, r *http.Request) {
 		p := strings.Split(html.EscapeString(r.URL.Path), "/")
 		usr := p[len(p)-1]
 		client := &http.Client{}
@@ -109,5 +119,11 @@ func apiV1Github() {
 			return
 		}
 		w.Write(body)
+	})
+}
+
+func apiV1NUID(mnt string) {
+	http.HandleFunc(mnt, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "%s", nuid.Next())
 	})
 }
