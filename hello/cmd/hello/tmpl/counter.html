@@ -8,10 +8,10 @@
   import { set, get, update } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm';
   initCounter();
 
-  let incrBtn = document.getElementById("incrBtn");
+  let incrBtn = document.getElementById({{.incrBtn.ID}});
   incrBtn.onclick=incrCounter;
 
-  let decrBtn = document.getElementById("decrBtn");
+  let decrBtn = document.getElementById({{.decrBtn.ID}});
   decrBtn.onclick=decrCounter;
 
   function showCounter() {
@@ -32,7 +32,6 @@
     update('counter',(val)=>val?val:0);
     showCounter();
   }
-
 
 </script>
 {{- end -}}
