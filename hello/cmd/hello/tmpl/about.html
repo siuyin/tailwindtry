@@ -1,8 +1,15 @@
 {{- define "about" -}}
 {{template "header" .}}
 {{template "subject" "About Us"}}
-<div>
-  The quick brown fox jumps over the lazy dog.
+<div class="text-lg">
+<p>I wrote this to exercise my CSS skills.
+This was styled with Tailwind CSS (https://tailwindcss.com/).
+
+<p>I also wanted to see if I could implement 'web components' with
+`go` templates. You are seeing its successful implementation.
+
+<p>Then I experimented with persisting state for each client using
+indexedDB. indexedDB is available within all modern browsers.
 </div>
 {{template "footer" .}}
 {{- end -}}
