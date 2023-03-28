@@ -61,6 +61,8 @@ func rootHandler(mnt string, tmpl *template.Template) {
 				ID  string
 				Btn Button
 			}{"modal1", Button{"modClose", "Close", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("modal1").classList.add("hidden")`)}},
+			"incrBtn": Button{"incrBtn", "+1", "text-gray-800", "bg-gray-100", template.JS(``)},
+			"decrBtn": Button{"decrBtn", "-1", "text-gray-800", "bg-gray-100", template.JS(``)},
 		})
 	})
 }
