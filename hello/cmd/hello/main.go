@@ -30,9 +30,7 @@ func main() {
 	tmpl := template.Must(template.ParseFS(content, "tmpl/*.html"))
 
 	rootHandler("/", tmpl)
-
 	aboutHandler("/about", tmpl)
-
 	contactHandler("/contact", tmpl)
 
 	robotstxt("/robots.txt")
@@ -56,7 +54,7 @@ func rootHandler(mnt string, tmpl *template.Template) {
 		tmpl.ExecuteTemplate(w, "main", map[string]interface{}{
 			"title":   "Gerbau",
 			"content": func() string { return "brown fox" }(),
-			"btn1":    Button{"btn1", "Lazy Dog", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML="You clicked the button"`)},
+			"btn1":    Button{"btn1", "Lazy Dog", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML="<p class='text-emerald-800'>Dog responds with a lazy woof!</p>"`)},
 			"btn2":    Button{"btn2", "Clear", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML=""`)},
 			"mod1":    Button{"mod1", "Modal Demo", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("modal1").classList.remove("hidden")`)},
 			"modal1": struct {
