@@ -1,12 +1,12 @@
 {{- define "counter" -}}
 <div class="mt-2 text-xl">
   Counter:
-  {{template "button" .incrBtn}} {{template "button" .decrBtn}} : <span id="counterStatus"></span>
+  {{template "button" .decrBtn}} {{template "button" .incrBtn}} : <span id="counterStatus"></span>
+  <span class="text-sm">note: this is stored in the browser's indexedDB.<span>
 </div>
 <script type="module">
-  import { get, set, update, clear} from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm';
-
-  showCounter();
+  import { set, get, update } from 'https://cdn.jsdelivr.net/npm/idb-keyval@6/+esm';
+  initCounter();
 
   let incrBtn = document.getElementById("incrBtn");
   incrBtn.onclick=incrCounter;
@@ -26,6 +26,10 @@
 
   function decrCounter(){
     update('counter',(val)=>(val||0)-1);
+    showCounter();
+  }
+  function initCounter(){
+    update('counter',(val)=>val?val:0);
     showCounter();
   }
 
