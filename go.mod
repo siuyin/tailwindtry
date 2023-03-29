@@ -10,7 +10,7 @@ require (
 	github.com/nats-io/nats.go v1.25.0 // indirect
 	github.com/nats-io/nkeys v0.4.4 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/siuyin/dflt v0.0.0-20190616123008-ea16caf9b8ef // indirect
+	github.com/siuyin/dflt v0.0.0-20230329062002-0475f4d54412 // indirect
 	golang.org/x/crypto v0.6.0 // indirect
 	golang.org/x/sys v0.5.0 // indirect
 	golang.org/x/time v0.3.0 // indirect

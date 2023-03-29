@@ -34,9 +34,11 @@ type TimeDemoConf struct {
 	Host   string
 }
 
-var timeDemoConf = &TimeDemoConf{4222, 3000, "localhost"}
+var timeDemoConf *TimeDemoConf
 
 func main() {
+	timeDemoConf = timeDemoConfEnv()
+
 	//tmpl := template.Must(template.ParseGlob("./tmpl/*.html"))
 	tmpl := template.Must(template.ParseFS(content, "tmpl/*.html"))
 
@@ -55,6 +57,14 @@ func main() {
 	timeDemo(timeDemoConf)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
+}
+
+func timeDemoConfEnv() *TimeDemoConf {
+	return &TimeDemoConf{
+		Port:   dflt.EnvIntMust("NATS_PORT", 4222),
+		WSPort: dflt.EnvIntMust("NATS_WS_PORT", 3000),
+		Host:   dflt.EnvString("NATS_HOST", "localhost"),
+	}
 }
 
 func rootHandler(mnt string, tmpl *template.Template) {
