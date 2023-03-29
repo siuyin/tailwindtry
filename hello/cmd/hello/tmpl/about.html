@@ -1,6 +1,6 @@
 {{- define "about" -}}
 {{template "header" .}}
-{{template "subject" "About Us"}}
+{{template "subject" "About this site"}}
 <div class="text-lg">
 <p>I wrote this to exercise my CSS skills.
 This was styled with Tailwind CSS (https://tailwindcss.com/).
@@ -10,6 +10,8 @@ This was styled with Tailwind CSS (https://tailwindcss.com/).
 
 <p>Then I experimented with persisting state for each client using
 indexedDB. indexedDB is available within all modern browsers.
+
+<p>See the timeDemo code for an application of NATS pub/sub over websockets. 
 </div>
 {{template "footer" .}}
 {{- end -}}

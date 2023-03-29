@@ -1,6 +1,7 @@
 {{- define "main" -}}
   {{template "header" .}}
   {{template "subject" "Welcome to Gerbau"}}
+  {{template "time" .timeDemo}}
   <p class="text-xl text-emerald-800">{{.content}}</p>
   <div>
     {{template "button" .btn1}}
@@ -12,6 +13,5 @@
   </div>
   {{template "modal" .modal1}}
   {{template "counter" .}}
-  {{template "time" .timeDemo}}
   {{template "footer" .}}
 {{- end -}}
