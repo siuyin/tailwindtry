@@ -9,7 +9,10 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"time"
 
+	svr "github.com/nats-io/nats-server/v2/server"
+	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nuid"
 	"github.com/siuyin/dflt"
 )
@@ -40,6 +43,8 @@ func main() {
 
 	//http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.Handle("/static/", http.FileServer(http.FS(content)))
+
+	embedNATS()
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -126,4 +131,36 @@ func apiV1NUID(mnt string) {
 	http.HandleFunc(mnt, func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "%s", nuid.Next())
 	})
+}
+
+func embedNATS() {
+	opts, err := svr.ProcessConfigFile("./nats.conf")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s, err := svr.NewServer(opts)
+	if err != nil {
+		log.Fatal(err)
+	}
+	s.Start()
+
+	nc, err := nats.Connect(nats.DefaultURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	c, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	go func() {
+		for {
+			tm := time.Now().Format("15:04:05")
+			c.Publish("terpau", tm)
+			time.Sleep(time.Second)
+
+		}
+	}()
 }

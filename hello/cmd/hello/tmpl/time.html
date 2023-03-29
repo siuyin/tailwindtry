@@ -1,0 +1,26 @@
+{{- define "time" -}}
+<div class="text-4xl" id="timeDisplay"></div>
+<script defer type="module">
+  // ES6 modules can be natively used by set the script type
+  // to "module". Now we can use native imports.
+  import {
+    connect,
+    StringCodec,
+  } from "https://cdn.jsdelivr.net/npm/nats.ws@1.14.0/esm/nats.js";
+
+  const td = document.getElementById("timeDisplay");
+
+  const sc = new StringCodec();
+  const nc = await connect({ servers: ["ws://127.0.0.1:3000"] });
+  console.log("connected");
+  const sub = nc.subscribe("terpau"); // some random string
+  (async () => {
+    const sub = nc.subscribe("terpau");
+    for await (const m of sub) {
+      const msg = sc.decode(m.data);
+      console.log(`Received: ${msg}`);
+      td.innerHTML=msg;
+    }
+  })().then();
+</script>
+{{- end -}}
