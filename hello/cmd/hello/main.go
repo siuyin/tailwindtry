@@ -159,15 +159,15 @@ func timeDemo(cfg *TimeDemoConf) {
 		log.Fatal(err)
 	}
 
-	c, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
-	if err != nil {
-		log.Fatal(err)
-	}
+	//c, err := nats.NewEncodedConn(nc, nats.JSON_ENCODER)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
 
 	go func() {
 		for {
 			tm := time.Now().Format("15:04:05")
-			c.Publish("time.demo", tm)
+			nc.Publish("time.demo", []byte(tm))
 			time.Sleep(time.Second)
 		}
 	}()
