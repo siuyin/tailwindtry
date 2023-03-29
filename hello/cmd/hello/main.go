@@ -28,6 +28,14 @@ type Button struct {
 	OnClick template.JS
 }
 
+type TimeDemoConf struct {
+	Port   int
+	WSPort int
+	Host   string
+}
+
+var timeDemoConf = &TimeDemoConf{4222, 3000, "localhost"}
+
 func main() {
 	//tmpl := template.Must(template.ParseGlob("./tmpl/*.html"))
 	tmpl := template.Must(template.ParseFS(content, "tmpl/*.html"))
@@ -44,7 +52,7 @@ func main() {
 	//http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.Handle("/static/", http.FileServer(http.FS(content)))
 
-	embedNATS()
+	timeDemo(timeDemoConf)
 
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -56,7 +64,7 @@ func rootHandler(mnt string, tmpl *template.Template) {
 			return
 		}
 
-		tmpl.ExecuteTemplate(w, "main", map[string]interface{}{
+		tmpl.ExecuteTemplate(w, "main", map[string]any{
 			"title":   "Gerbau",
 			"content": func() string { return "brown fox" }(),
 			"btn1":    Button{"btn1", "Lazy Dog", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("status").innerHTML="<p class='text-emerald-800'>Dog responds with a lazy woof!</p>"`)},
@@ -66,8 +74,9 @@ func rootHandler(mnt string, tmpl *template.Template) {
 				ID  string
 				Btn Button
 			}{"modal1", Button{"modClose", "Close", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("modal1").classList.add("hidden")`)}},
-			"incrBtn": Button{"incrBtn", "+1", "text-gray-800", "bg-gray-100", template.JS(``)},
-			"decrBtn": Button{"decrBtn", "-1", "text-gray-800", "bg-gray-100", template.JS(``)},
+			"incrBtn":  Button{"incrBtn", "+1", "text-gray-800", "bg-gray-100", template.JS(``)},
+			"decrBtn":  Button{"decrBtn", "-1", "text-gray-800", "bg-gray-100", template.JS(``)},
+			"timeDemo": timeDemoConf,
 		})
 	})
 }
@@ -133,10 +142,10 @@ func apiV1NUID(mnt string) {
 	})
 }
 
-func embedNATS() {
-	opts, err := svr.ProcessConfigFile("./nats.conf")
-	if err != nil {
-		log.Fatal(err)
+func timeDemo(cfg *TimeDemoConf) {
+	//opts, _:= svr.ProcessConfigFile("nats.conf") // not embed.FS compatible
+	opts := &svr.Options{JetStream: true,
+		Websocket: svr.WebsocketOpts{Port: cfg.WSPort, NoTLS: true},
 	}
 
 	s, err := svr.NewServer(opts)
@@ -158,9 +167,8 @@ func embedNATS() {
 	go func() {
 		for {
 			tm := time.Now().Format("15:04:05")
-			c.Publish("terpau", tm)
+			c.Publish("time.demo", tm)
 			time.Sleep(time.Second)
-
 		}
 	}()
 }

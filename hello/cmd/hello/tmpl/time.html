@@ -1,5 +1,8 @@
 {{- define "time" -}}
-<div class="text-4xl" id="timeDisplay"></div>
+<div>
+  Time as subscribed from NATS server: 
+  <span class="text-4xl" id="timeDisplay"></span>
+</div>
 <script defer type="module">
   // ES6 modules can be natively used by set the script type
   // to "module". Now we can use native imports.
@@ -11,16 +14,24 @@
   const td = document.getElementById("timeDisplay");
 
   const sc = new StringCodec();
-  const nc = await connect({ servers: ["ws://127.0.0.1:3000"] });
-  console.log("connected");
-  const sub = nc.subscribe("terpau"); // some random string
+  const nc = await connect({ servers: ["ws://{{.Host}}:{{.WSPort}}"] });
+  /*
   (async () => {
-    const sub = nc.subscribe("terpau");
+    const sub = nc.subscribe("time.demo");
     for await (const m of sub) {
       const msg = sc.decode(m.data);
-      console.log(`Received: ${msg}`);
       td.innerHTML=msg;
     }
   })().then();
+  */
+  async function timeSubscr() {
+    const sub = nc.subscribe("time.demo");
+    for await (const msg of sub) {
+      const m = sc.decode(msg.data);
+      td.innerHTML=m;
+    }
+  }
+
+  timeSubscr();
 </script>
 {{- end -}}
