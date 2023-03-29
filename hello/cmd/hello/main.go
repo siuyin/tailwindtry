@@ -154,7 +154,7 @@ func timeDemo(cfg *TimeDemoConf) {
 	}
 	s.Start()
 
-	nc, err := nats.Connect(nats.DefaultURL)
+	nc, err := nats.Connect(fmt.Sprintf("nats://%s:%d", cfg.Host, cfg.Port))
 	if err != nil {
 		log.Fatal(err)
 	}
