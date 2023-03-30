@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"embed"
 	"fmt"
 	"html"
@@ -56,6 +57,9 @@ func main() {
 
 	timeDemo(timeDemoConf)
 
+	go func() {
+		log.Fatal(http.ListenAndServeTLS(":8443", "/h/Dropbox/cfssl/server.pem", "/h/Dropbox/cfssl/server-key.pem", nil))
+	}()
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
@@ -159,8 +163,15 @@ func apiV1NUID(mnt string) {
 
 func timeDemo(cfg *TimeDemoConf) {
 	//opts, _:= svr.ProcessConfigFile("nats.conf") // not embed.FS compatible
+	cert, err := tls.LoadX509KeyPair("/h/Dropbox/cfssl/server.pem", "/h/Dropbox/cfssl/server-key.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
 	opts := &svr.Options{JetStream: true,
-		Websocket: svr.WebsocketOpts{Port: cfg.WSPort, NoTLS: true},
+		Websocket: svr.WebsocketOpts{Port: cfg.WSPort,
+			//NoTLS: true,
+			TLSConfig: &tls.Config{Certificates: []tls.Certificate{cert}},
+		},
 	}
 
 	s, err := svr.NewServer(opts)

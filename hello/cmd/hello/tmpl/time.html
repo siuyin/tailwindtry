@@ -14,7 +14,7 @@
   const td = document.getElementById("timeDisplay");
 
   const sc = new StringCodec();
-  const nc = await connect({ servers: ["ws://{{.Host}}:{{.WSPort}}"] });
+  const nc = await connect({ servers: ["wss://{{.Host}}:{{.WSPort}}"] });
   /*
   (async () => {
     const sub = nc.subscribe("time.demo");
