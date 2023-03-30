@@ -74,6 +74,11 @@ func rootHandler(mnt string, tmpl *template.Template) {
 			return
 		}
 
+		//w.Header().Add("Content-Encoding", "gzip")
+		//gw := gzip.NewWriter(w)
+		//defer gw.Close()
+
+		//tmpl.ExecuteTemplate(gw, "main", map[string]any{
 		tmpl.ExecuteTemplate(w, "main", map[string]any{
 			"title":   "Gerbau",
 			"content": func() string { return "brown fox" }(),
