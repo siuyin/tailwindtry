@@ -1,3 +1,5 @@
+server.pem
+server-key.pem
 *secret*
 *.swp
 node_modules

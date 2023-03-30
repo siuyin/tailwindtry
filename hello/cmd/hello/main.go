@@ -58,7 +58,7 @@ func main() {
 	timeDemo(timeDemoConf)
 
 	go func() {
-		log.Fatal(http.ListenAndServeTLS(":8443", "/h/Dropbox/cfssl/server.pem", "/h/Dropbox/cfssl/server-key.pem", nil))
+		log.Fatal(http.ListenAndServeTLS(":8443", "server.pem", "server-key.pem", nil))
 	}()
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -163,7 +163,7 @@ func apiV1NUID(mnt string) {
 
 func timeDemo(cfg *TimeDemoConf) {
 	//opts, _:= svr.ProcessConfigFile("nats.conf") // not embed.FS compatible
-	cert, err := tls.LoadX509KeyPair("/h/Dropbox/cfssl/server.pem", "/h/Dropbox/cfssl/server-key.pem")
+	cert, err := tls.LoadX509KeyPair("server.pem", "server-key.pem")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -180,7 +180,7 @@ func timeDemo(cfg *TimeDemoConf) {
 	}
 	s.Start()
 
-	nc, err := nats.Connect(fmt.Sprintf("nats://%s:%d", cfg.Host, cfg.Port))
+	nc, err := nats.Connect(fmt.Sprintf("nats://localhost:%d", cfg.Port)) // always connect to localhost as NATS is embedded.
 	if err != nil {
 		log.Fatal(err)
 	}
