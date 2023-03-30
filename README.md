@@ -17,6 +17,10 @@ npx tailwindcss -i ./src/styles.css -o ./cmd/hello/static/styles.min.css --watch
 ```
 
 ## Run the go web server
+The http and websocket servers have been updated to use transport layer security (TLS).
+place server.pem and server-key.pem at the `hello/cmd/hello` folder.
+Other files and static assest have been embedded with the go binary using `embed` https://pkg.go.dev/embed
+
 ```
 cd hello/cmd/hello
 go run main.go // serves to port 8080
