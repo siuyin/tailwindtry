@@ -29,21 +29,24 @@ type Button struct {
 	OnClick template.JS
 }
 
-type TimeDemoConf struct {
+type NATSConf struct {
 	Port   int
 	WSPort int
 	Host   string
 }
 
-var timeDemoConf *TimeDemoConf
+var natsConf *NATSConf
 
 func main() {
-	timeDemoConf = timeDemoConfEnv()
+	natsConf = natsConfEnv()
+	nc := natsInit(natsConf)
+	defer nc.Close()
 
 	//tmpl := template.Must(template.ParseGlob("./tmpl/*.html"))
 	tmpl := template.Must(template.ParseFS(content, "tmpl/*.html"))
 
 	rootHandler("/", tmpl)
+	priceHandler("/price", tmpl, nc, natsConf)
 	aboutHandler("/about", tmpl)
 	contactHandler("/contact", tmpl)
 
@@ -55,7 +58,7 @@ func main() {
 	//http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("./static"))))
 	http.Handle("/static/", http.FileServer(http.FS(content)))
 
-	timeDemo(timeDemoConf)
+	timeDemo(nc)
 
 	go func() {
 		log.Fatal(http.ListenAndServeTLS(":8443", "server.pem", "server-key.pem", nil))
@@ -63,8 +66,8 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
-func timeDemoConfEnv() *TimeDemoConf {
-	return &TimeDemoConf{
+func natsConfEnv() *NATSConf {
+	return &NATSConf{
 		Port:   dflt.EnvIntMust("NATS_PORT", 4222),
 		WSPort: dflt.EnvIntMust("NATS_WS_PORT", 3000),
 		Host:   dflt.EnvString("NATS_HOST", "localhost"),
@@ -95,7 +98,7 @@ func rootHandler(mnt string, tmpl *template.Template) {
 			}{"modal1", Button{"modClose", "Close", "text-gray-800", "bg-gray-100", template.JS(`document.getElementById("modal1").classList.add("hidden")`)}},
 			"incrBtn":  Button{"incrBtn", "+1", "text-gray-800", "bg-gray-100", template.JS(``)},
 			"decrBtn":  Button{"decrBtn", "-1", "text-gray-800", "bg-gray-100", template.JS(``)},
-			"timeDemo": timeDemoConf,
+			"timeDemo": natsConf,
 		})
 	})
 }
@@ -104,6 +107,27 @@ func robotstxt(mnt string) {
 	http.HandleFunc(mnt, func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `User-agent: *
 		Disallow: /login/`)
+	})
+}
+
+func initPriceDB(nc *nats.Conn) {
+	jc, err := nc.JetStream()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	jc.CreateKeyValue(&nats.KeyValueConfig{Bucket: "priceKV"})
+}
+
+func priceHandler(mnt string, tmpl *template.Template, nc *nats.Conn, cfg *NATSConf) {
+	initPriceDB(nc)
+	http.HandleFunc(mnt, func(w http.ResponseWriter, r *http.Request) {
+		tmpl.ExecuteTemplate(w, "price", map[string]any{
+			"title":     "Price",
+			"lookupBtn": Button{"lookupBtn", "Find", "text-gray-800", "bg-gray-100", template.JS(``)},
+			"updateBtn": Button{"updateBtn", "Update", "text-gray-800", "bg-gray-100", template.JS(``)},
+			"natsCfg":   cfg,
+		})
 	})
 }
 
@@ -161,7 +185,7 @@ func apiV1NUID(mnt string) {
 	})
 }
 
-func timeDemo(cfg *TimeDemoConf) {
+func natsInit(cfg *NATSConf) *nats.Conn {
 	//opts, _:= svr.ProcessConfigFile("nats.conf") // not embed.FS compatible
 	cert, err := tls.LoadX509KeyPair("server.pem", "server-key.pem")
 	if err != nil {
@@ -189,7 +213,9 @@ func timeDemo(cfg *TimeDemoConf) {
 	//if err != nil {
 	//	log.Fatal(err)
 	//}
-
+	return nc
+}
+func timeDemo(nc *nats.Conn) {
 	go func() {
 		for {
 			tm := time.Now().Format("15:04:05")

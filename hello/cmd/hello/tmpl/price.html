@@ -1,0 +1,70 @@
+{{- define "price" -}}
+{{template "header" .}}
+{{template "subject" "Price Management"}}
+<div>
+  <h2 class="text-2xl">Lookup</h2>
+    <div class="text-lg">
+      <div class="m-2">ID: <input type="text" id="lookupID" class="border ml-2" placeholder="a123"></div>
+      {{template "button" .lookupBtn}}
+  </div>
+  <div id="lookupResults">lookup results</div>
+
+  <h2 class="text-2xl mt-6">Update</h2>
+    <form id="updateForm">
+    <div class="text-lg">
+      <div class="m-2">ID: <input type="text" name="id" class="border ml-2" placeholder="a123"></div>
+      <div class="m-2">Description: <input type="text" name="description" class="border ml-2" placeholder="apples, qty 5"></div>
+      <div class="m-2">Price: <input type="text" name="price" class="border ml-2" placeholder="1.99"></div>
+      <div class="m-2">Authorization: <input type="password" name="authz" class="border ml-2" placeholder="Picard alpha-1"></div>
+      {{template "button" .updateBtn}}
+    </div>
+    </form>
+  <div id="updateResults">update results</div>
+
+</div>
+
+<script type="module">
+  import {
+    connect,
+    StringCodec,
+    JSONCodec,
+  } from "https://cdn.jsdelivr.net/npm/nats.ws@1.14.0/esm/nats.js";
+
+  const sc = new StringCodec();
+  const jc = JSONCodec();
+  const nc = await connect({ servers: ["wss://{{.natsCfg.Host}}:{{.natsCfg.WSPort}}"] });
+  const js = nc.jetstream();
+  const kv = await js.views.kv("priceKV");
+
+  const lookupBtn=document.getElementById("lookupBtn");
+  lookupBtn.onclick=lookupClicked;
+  async function lookupClicked(){
+    const lookupID=document.getElementById("lookupID"); 
+    const e = await kv.get(lookupID.value);
+    const lookupResults=document.getElementById("lookupResults");
+    if (!e) {
+      lookupResults.innerHTML=`value for "${lookupID.value}" not found`;
+      return
+    }
+    lookupResults.innerHTML=sc.decode(e.value);
+  }
+
+  const updateBtn=document.getElementById("updateBtn");
+  updateBtn.onclick=updateBtnClicked;
+  async function updateBtnClicked(event) {
+    event.preventDefault();
+    const form = document.getElementById("updateForm");
+    const data = new FormData(form);
+    const obj=Object.fromEntries(data.entries());
+    const updateResults = document.getElementById("updateResults");
+    if (!obj.authz || obj.authz!="Picard alpha-1") {
+      updateResults.innerHTML="invalid authorization";
+    }
+    updateResults.innerHTML="updating...";
+    await kv.put(obj.id, jc.encode({"price":parseFloat(obj.price),"description":obj.description}));
+    updateResults.innerHTML="updated.";
+  }
+
+</script>
+{{template "footer" .}}
+{{- end -}}
