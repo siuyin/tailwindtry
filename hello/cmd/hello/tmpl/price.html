@@ -30,6 +30,7 @@
     JSONCodec,
   } from "https://cdn.jsdelivr.net/npm/nats.ws@1.14.0/esm/nats.js";
 
+
   const sc = new StringCodec();
   const jc = JSONCodec();
   const nc = await connect({ servers: ["wss://{{.natsCfg.Host}}:{{.natsCfg.WSPort}}"] });
@@ -51,14 +52,16 @@
 
   const updateBtn=document.getElementById("updateBtn");
   updateBtn.onclick=updateBtnClicked;
+  import bcrypt from "https://cdn.jsdelivr.net/npm/bcryptjs@2.4.3/+esm";
   async function updateBtnClicked(event) {
     event.preventDefault();
     const form = document.getElementById("updateForm");
     const data = new FormData(form);
     const obj=Object.fromEntries(data.entries());
     const updateResults = document.getElementById("updateResults");
-    if (!obj.authz || obj.authz!="Picard alpha-1") {
+    if (!obj.authz || !bcrypt.compareSync(obj.authz,"$2a$11$vx7pAS4LA2cxv/3/a1.1i.Uw6gLxu6oW1fkMOqAKrvC0gVSQxmf/G")) {
       updateResults.innerHTML="invalid authorization";
+      return;
     }
     updateResults.innerHTML="updating...";
     await kv.put(obj.id, jc.encode({"price":parseFloat(obj.price),"description":obj.description}));
