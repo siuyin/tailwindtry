@@ -39,6 +39,10 @@
 
   const lookupBtn=document.getElementById("lookupBtn");
   lookupBtn.onclick=lookupClicked;
+  document.getElementById("lookupID").addEventListener("keyup", ({key})=>{
+    if (key === "Enter") lookupClicked()
+  });
+
   async function lookupClicked(){
     const lookupID=document.getElementById("lookupID"); 
     const e = await kv.get(lookupID.value);
