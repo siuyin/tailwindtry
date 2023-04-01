@@ -47,15 +47,16 @@
     const lookupID=document.getElementById("lookupID"); 
     try {
       const e = await kv.get(lookupID.value);
+      const lookupResults=document.getElementById("lookupResults");
+      if (!e) {
+        lookupResults.innerHTML=`value for "${lookupID.value}" not found`;
+        return
+      }
+      lookupResults.innerHTML=sc.decode(e.value);
     } catch (err) {
-    console.log(err)
+      console.log(err)
+      lookupResults.innerHTML=`lookup for "${lookupID.value}" failed: ${err}`;
     }
-    const lookupResults=document.getElementById("lookupResults");
-    if (typeof e == 'undefined') {
-      lookupResults.innerHTML=`value for "${lookupID.value}" not found`;
-      return
-    }
-    lookupResults.innerHTML=sc.decode(e.value);
   }
 
   const updateBtn=document.getElementById("updateBtn");
