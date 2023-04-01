@@ -127,6 +127,7 @@ func priceHandler(mnt string, tmpl *template.Template, nc *nats.Conn, cfg *NATSC
 			"lookupBtn": Button{"lookupBtn", "Find", "text-gray-800", "bg-gray-100", template.JS(``)},
 			"updateBtn": Button{"updateBtn", "Update", "text-gray-800", "bg-gray-100", template.JS(``)},
 			"natsCfg":   cfg,
+			"authz":     dflt.EnvString("PRICE_AUTHZ_HASH", "$2a$11$vx7pAS4LA2cxv/3/a1.1i.Uw6gLxu6oW1fkMOqAKrvC0gVSQxmf/G"),
 		})
 	})
 }

@@ -4,7 +4,7 @@
 <div>
   <h2 class="text-2xl">Lookup</h2>
     <div class="text-lg">
-      <div class="m-2">ID: <input type="text" id="lookupID" class="border ml-2" placeholder="a123"></div>
+      <div class="m-2">ID: <input type="text" id="lookupID" class="border ml-2 pl-1" placeholder="a123"></div>
       {{template "button" .lookupBtn}}
   </div>
   <div id="lookupResults">lookup results</div>
@@ -12,10 +12,10 @@
   <h2 class="text-2xl mt-6">Update</h2>
     <form id="updateForm">
     <div class="text-lg">
-      <div class="m-2">ID: <input type="text" name="id" class="border ml-2" placeholder="a123"></div>
-      <div class="m-2">Description: <input type="text" name="description" class="border ml-2" placeholder="apples, qty 5"></div>
-      <div class="m-2">Price: <input type="text" name="price" class="border ml-2" placeholder="1.99"></div>
-      <div class="m-2">Authorization: <input type="password" name="authz" class="border ml-2" placeholder="Picard alpha-1"></div>
+      <div class="m-2">ID: <input type="text" name="id" class="border ml-2 pl-1" placeholder="a123"></div>
+      <div class="m-2">Description: <input type="text" name="description" class="border ml-2 pl-1" placeholder="apples, qty 5"></div>
+      <div class="m-2">Price: <input type="text" name="price" class="border ml-2 pl-1" placeholder="1.99"></div>
+      <div class="m-2">Authorization: <input type="password" name="authz" class="border ml-2 pl-1" placeholder="Picard alpha-1"></div>
       {{template "button" .updateBtn}}
     </div>
     </form>
@@ -45,9 +45,13 @@
 
   async function lookupClicked(){
     const lookupID=document.getElementById("lookupID"); 
-    const e = await kv.get(lookupID.value);
+    try {
+      const e = await kv.get(lookupID.value);
+    } catch (err) {
+    console.log(err)
+    }
     const lookupResults=document.getElementById("lookupResults");
-    if (!e) {
+    if (typeof e == 'undefined') {
       lookupResults.innerHTML=`value for "${lookupID.value}" not found`;
       return
     }
@@ -63,7 +67,7 @@
     const data = new FormData(form);
     const obj=Object.fromEntries(data.entries());
     const updateResults = document.getElementById("updateResults");
-    if (!obj.authz || !bcrypt.compareSync(obj.authz,"$2a$11$vx7pAS4LA2cxv/3/a1.1i.Uw6gLxu6oW1fkMOqAKrvC0gVSQxmf/G")) {
+    if (!obj.authz || !bcrypt.compareSync(obj.authz,{{.authz}})) {
       updateResults.innerHTML="invalid authorization";
       return;
     }
