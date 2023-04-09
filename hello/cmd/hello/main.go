@@ -62,23 +62,10 @@ func main() {
 	timeDemo(nc)
 
 	go func() {
-		svrPEM, err := content.ReadFile("server.pem")
-		if err != nil {
-			log.Fatal(err)
-		}
-		svrKeyPEM, err := content.ReadFile("server-key.pem")
-		if err != nil {
-			log.Fatal(err)
-		}
-
-		cert, err := tls.X509KeyPair(svrPEM, svrKeyPEM)
-		if err != nil {
-			log.Fatal(err)
-		}
+		cert := tlsCert()
 		tlsConfig := &tls.Config{Certificates: []tls.Certificate{cert}}
 		server := http.Server{Addr: ":8443", TLSConfig: tlsConfig}
 		log.Fatal(server.ListenAndServeTLS("", ""))
-		//log.Fatal(http.ListenAndServeTLS(":8443", "server.pem", "server-key.pem", nil))
 	}()
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -203,8 +190,7 @@ func apiV1NUID(mnt string) {
 	})
 }
 
-func natsInit(cfg *NATSConf) *nats.Conn {
-	//opts, _:= svr.ProcessConfigFile("nats.conf") // not embed.FS compatible
+func tlsCert() tls.Certificate {
 	svrPEM, err := content.ReadFile("server.pem")
 	if err != nil {
 		log.Fatal(err)
@@ -214,11 +200,15 @@ func natsInit(cfg *NATSConf) *nats.Conn {
 		log.Fatal(err)
 	}
 
-	//cert, err := tls.LoadX509KeyPair("server.pem", "server-key.pem")
 	cert, err := tls.X509KeyPair(svrPEM, svrKeyPEM)
 	if err != nil {
 		log.Fatal(err)
 	}
+	return cert
+}
+
+func natsInit(cfg *NATSConf) *nats.Conn {
+	cert := tlsCert()
 	opts := &svr.Options{JetStream: true,
 		Websocket: svr.WebsocketOpts{Port: cfg.WSPort,
 			//NoTLS: true,
