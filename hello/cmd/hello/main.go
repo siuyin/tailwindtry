@@ -19,6 +19,7 @@ import (
 )
 
 //go:embed all:static all:tmpl
+//go:embed server.pem server-key.pem
 var content embed.FS
 
 type Button struct {
@@ -61,7 +62,23 @@ func main() {
 	timeDemo(nc)
 
 	go func() {
-		log.Fatal(http.ListenAndServeTLS(":8443", "server.pem", "server-key.pem", nil))
+		svrPEM, err := content.ReadFile("server.pem")
+		if err != nil {
+			log.Fatal(err)
+		}
+		svrKeyPEM, err := content.ReadFile("server-key.pem")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		cert, err := tls.X509KeyPair(svrPEM, svrKeyPEM)
+		if err != nil {
+			log.Fatal(err)
+		}
+		tlsConfig := &tls.Config{Certificates: []tls.Certificate{cert}}
+		server := http.Server{Addr: ":8443", TLSConfig: tlsConfig}
+		log.Fatal(server.ListenAndServeTLS("", ""))
+		//log.Fatal(http.ListenAndServeTLS(":8443", "server.pem", "server-key.pem", nil))
 	}()
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
@@ -188,7 +205,17 @@ func apiV1NUID(mnt string) {
 
 func natsInit(cfg *NATSConf) *nats.Conn {
 	//opts, _:= svr.ProcessConfigFile("nats.conf") // not embed.FS compatible
-	cert, err := tls.LoadX509KeyPair("server.pem", "server-key.pem")
+	svrPEM, err := content.ReadFile("server.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
+	svrKeyPEM, err := content.ReadFile("server-key.pem")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	//cert, err := tls.LoadX509KeyPair("server.pem", "server-key.pem")
+	cert, err := tls.X509KeyPair(svrPEM, svrKeyPEM)
 	if err != nil {
 		log.Fatal(err)
 	}
